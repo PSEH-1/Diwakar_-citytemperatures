@@ -1,4 +1,4 @@
-package com.sapient.weatherapp.weathernext3days;
+package com.sapient.weatherapp.weathernext3days.app;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
