@@ -89,7 +89,13 @@ public class WeatherServiceImpl implements WeatherService{
 			List<NextDayForecast> dayForecastList = forecastMapper.get(index);
 			int intSize = weather.getForecasts().size();
 			
-			dayForecastList.forEach(element-> forecastFilter(weather,element));
+			dayForecastList.forEach(element-> {
+				try {
+					forecastFilter(weather,element);
+				} catch (ParseException e) {
+					throw new WeatherDataParseException(e.getMessage());
+				}
+			});
 			int finalSize = weather.getForecasts().size();
 		
 			if(finalSize ==intSize ) {
@@ -98,19 +104,32 @@ public class WeatherServiceImpl implements WeatherService{
 				weather.getForecasts().add(dayForecast);
 			}
 			
-			//System.out.println("weather.getForecasts().size()="+weather.getForecasts().size());
+			System.out.println("weather.getForecasts().size()="+weather.getForecasts().size());
 			if(weather.getForecasts().size()==3) break;
 		}
 	}
 
-	private void forecastFilter(Weather weather, NextDayForecast forecast) {
-		if(forecast.getMax_temp()>40) {
-			forecast.setAction("Use sunscreen lotion");
-			weather.getForecasts().add(forecast);
+	@SuppressWarnings("deprecation")
+	private void forecastFilter(Weather weather, NextDayForecast currForecast) throws ParseException{
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		int size = weather.getForecasts().size();
+		
+		if(size>1) {
+			NextDayForecast prevForecast = weather.getForecasts().get(size-1);
+			
+			Date currdate = format.parse(currForecast.getDt_text());
+			Date prevdate = format.parse(prevForecast.getDt_text());
+			
+			if (prevdate.getDate() == currdate.getDate()) return;
 		}
-		else if (forecast.getAvg_humidity()>91){
-			forecast.setAction("Carry umbrella");	
-			weather.getForecasts().add(forecast);
+		
+		if(currForecast.getMax_temp()>40) {
+			currForecast.setAction("Use sunscreen lotion");
+			weather.getForecasts().add(currForecast);
+		}
+		else if (currForecast.getAvg_humidity()>91){
+			currForecast.setAction("Carry umbrella");	
+			weather.getForecasts().add(currForecast);
 		}
 		//skip otherwise		
 	}
