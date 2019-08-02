@@ -12,9 +12,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -51,7 +48,7 @@ public class WeatherServiceImpl implements WeatherService{
 	}
 	
 	//Data binding
-	private Weather getEntityForResponse(String response,ObjectMapper mapper) {
+	public Weather getEntityForResponse(String response,ObjectMapper mapper) {
 		Weather weather = new Weather();
 		try {
 			JsonNode  root =  mapper.readTree(response);
@@ -67,7 +64,7 @@ public class WeatherServiceImpl implements WeatherService{
 	}
 
 	private void buildWeatherForecast(Weather weather, JsonNode forecastList){
-		Map<Integer,List<NextDayForecast>>  forecastMapper = new HashMap();
+		Map<Integer,List<NextDayForecast>>  forecastMapper = new HashMap<>();
 		
 		try {
 			for(JsonNode entry:forecastList) {
@@ -101,6 +98,7 @@ public class WeatherServiceImpl implements WeatherService{
 				weather.getForecasts().add(dayForecast);
 			}
 			
+			//System.out.println("weather.getForecasts().size()="+weather.getForecasts().size());
 			if(weather.getForecasts().size()==3) break;
 		}
 	}
